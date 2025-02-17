@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Vias</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Cadastro de Vias</h1>
+
+        <form id="createRouteForm">
+            <label for="name">Nome da via:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="grade">Grau:</label>
+            <input type="text" id="grade" name="grade" required>
+
+            <label for="type">Tipo (Ex: esportiva, trad):</label>
+            <input type="text" id="type" name="type" required>
+
+            <button type="submit">Cadastrar Via</button>
+        </form>
+
+        <h2>Vias Cadastradas</h2>
+        <ul id="routesList"></ul>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get("user_id");
+
+        if (!userId) {
+            alert('Usuário não encontrado!');
+            window.location.href = "/index.html";  // Redireciona de volta à página de cadastro de usuário
+        }
+
+        // Função para cadastrar via
+        document.getElementById("createRouteForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const grade = document.getElementById("grade").value;
+            const type = document.getElementById("type").value;
+
+            // Realiza a requisição para cadastrar a via
+            fetch('/routes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, grade, type, user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    alert("Via cadastrada com sucesso!");
+                    loadRoutes();  // Atualiza a lista de vias
+                    // Limpa o formulário após o cadastro
+                    document.getElementById("createRouteForm").reset();
+                } else {
+                    alert("Erro ao cadastrar via.");
+                }
+            })
+            .catch(error => {
+                alert('Erro ao cadastrar via.');
+            });
+        });
+
+        // Função para listar vias cadastradas
+        function loadRoutes() {
+            fetch(`/users/${userId}/routes`, {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(routes => {
+                const routesList = document.getElementById("routesList");
+                routesList.innerHTML = '';  // Limpa a lista existente
+
+                if (routes.length === 0) {
+                    routesList.innerHTML = '<li>Nenhuma via cadastrada.</li>';
+                } else {
+                    routes.forEach(route => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `${route.name} - ${route.grade} (${route.type})`;
+                        routesList.appendChild(listItem);
+                    });
+                }
+            })
+            .catch(error => {
+                alert('Erro ao carregar vias.');
+            });
+        }
+
+        loadRoutes();  // Carrega as vias ao carregar a página
+    </script>
+
+</body>
+</html>

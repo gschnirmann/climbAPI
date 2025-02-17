@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuário</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Cadastro de Usuário</h1>
+        <form id="createUserForm">
+            <label for="username">Nome de usuário:</label>
+            <input type="text" id="username" name="username" required>
+            <button type="submit">Cadastrar</button>
+        </form>
+
+        <p id="message"></p>
+    </div>
+
+    <script>
+        document.getElementById("createUserForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById("username").value;
+            const messageElement = document.getElementById("message");
+
+            fetch('/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    messageElement.textContent = `Usuário criado com sucesso! ID: ${data.id}`;
+                    setTimeout(() => {
+                        window.location.href = `/routes.html?user_id=${data.id}`;  // Redireciona para a página de rotas
+                    }, 2000);
+                } else {
+                    messageElement.textContent = `Erro: ${data.message}`;
+                }
+            })
+            .catch(error => {
+                messageElement.textContent = 'Erro ao criar usuário.';
+            });
+        });
+    </script>
+
+</body>
+</html>
