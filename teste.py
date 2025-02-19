@@ -50,14 +50,15 @@ def list_users():
         print('Details: ', response.text)
     
 
-def add_route(name: str, grade: str, user_id: str,crag_id: str, type: str):
+def add_route(name: str, grade: str, user_id: str,crag_id: str, type: str, description: str):
     url = "http://127.0.0.1:5000/routes"
     data = {
         'name': name,
         'grade': grade,
         'type': type,
         'crag_id': crag_id,
-        'user_id': user_id
+        'user_id': user_id,
+        'description': description
 
     } 
     response = requests.post(url, json=data)
@@ -98,7 +99,7 @@ def list_routes(list_all: bool, user_id: int = 0, status = ''):
            print(f'|name: {route['name']}|\n'
                  f'|grade: {route['grade']}|\n'
                  f'|status: {route['type']}|\n'
-                 f'|crag: {crags_list[route['crag_id']-1]['cragname']}'
+                 f'|crag: {route['crag_id']}|\n'
                  f'|user id: {route['user_id']}|\n')
            
 
@@ -133,18 +134,18 @@ def list_crags():
         print('Details: ', response.text)
 
 op = 0
-while op != "6":
+while op != "7":
     op = input( '1 - Add user\n'
                 '2 - Add crag\n'
                 '3 - Add route\n'
-                '3 - List users\n'
-                '4 - List routes\n'
-                '5 - List crags\n'
-                '6 - Close the app...\n')
-    if op not in "123456":
+                '4 - List users\n'
+                '5 - List routes\n'
+                '6 - List crags\n'
+                '7 - Close the app...\n')
+    if op not in "1234567":
         print("Choose a valid option...")
         continue
-    elif op == "6":
+    elif op == "7":
         print("Closing the app...")
     elif op == "1":
         username = input("Enter your username:\n")
@@ -156,22 +157,16 @@ while op != "6":
         add_crag(cragname, country, city)
     elif op == "3":
         user_id = int(input("Enter a valid user id: "))
-        if check_user(user_id):
-            crag_id = int(input('Enter the route\'s crag id:\n'))
-            if check_crag(crag_id):
-                name = input('Enter the route\'s name: ')
-                grade = input('Enter the route\'s grade: ')
-                type = input('Enter the status (sent, project or wish): ')
-                add_route(name, grade, user_id ,crag_id, type)
-            else:
-                print('Invalid crag id...')
-                continue
-        else:
-            print('Invalid user id...')
-            continue
-    elif op == "3":
-        list_users()
+        crag_id = int(input('Enter the route\'s crag id:\n'))
+        name = input('Enter the route\'s name: ')
+        grade = input('Enter the route\'s grade: ')
+        type = input('Enter the status (sent, project or wish): ')
+        description = input('Enter the description:\n')
+        add_route(name, grade, user_id ,crag_id, type, description)
+
     elif op == "4":
+        list_users()
+    elif op == "5":
         op_aux = input('1 - List all routes\n'
                        '2 - List by user\n')
         if op_aux not in "12":
@@ -196,7 +191,7 @@ while op != "6":
                 list_routes(False, user_id, status='project')
             else:
                 list_routes(False, user_id, status='wish')
-    elif op == '5':
+    elif op == '6':
         list_crags()
 
 
