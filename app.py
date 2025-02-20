@@ -225,11 +225,11 @@ def remove_route(route_id):
     else:
         return jsonify({'error': 'not deleted'}), 404
 
-@app.route('/routes/<int:crag_id>', methods=['DELETE'])
+@app.route('/crags/<int:crag_id>', methods=['DELETE'])
 def remove_crag(crag_id):
     conn = sqlite3.connect('climb_API_db')
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM routes WHERE crag_id = ?', (crag_id,))
+    cursor.execute('DELETE FROM crags WHERE crag_id = ?', (crag_id,))
     conn.commit()
     conn.close()
 
