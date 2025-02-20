@@ -10,14 +10,6 @@ import sqlite3
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/routes.html')
-def routes_page():
-    return render_template('routes.html')
-
 
 @app.route('/crags', methods=['POST'])
 def add_crag():
@@ -50,8 +42,9 @@ def list_crags():
 
 @app.route('/users', methods=['POST'])
 def add_user():
-    data = request.get_json()
-    username = data.get('username')
+    #data = request.get_json()
+
+    username = request.form.get('username')
     if not username:
         return jsonify({'message': 'Please enter a username'}), 400
     
