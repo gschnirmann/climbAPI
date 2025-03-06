@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit route</title>
+</head>
+<body>
+    <h1>Edit {{ username }}'s route</h1>
+    <form action="{{ url_for('edit_route', route_id=route['id'], user_id=user_id) }}" method="POST">
+        <label for="name">Name: </label>
+        <input type="text" name="name" id="name" value="{{ route['name'] }}" required><br>
+
+        <label for="grade">Name: </label>
+        <input type="text" name="grade" id="grade" value="{{ route['grade'] }}" required><br>
+
+        <label for="type">Status: </label>
+        <select name="type" id="type">
+            <option value="sent">Sent</option>
+            <option value="project">Project</option>
+            <option value="wish">Wish</option>
+        </select><br>
+
+        <label for="crag">Crags: </label>
+        <select name="crag_id" id="crag_id">
+            {% for crag in crags %}
+            <option value="{{ crag['crag_id'] }}">{{ crag['cragname'] }}</option>
+            {% endfor %}
+        </select><br><br>
+        
+        <label for="description">Description: </label>
+        <textarea type="text" name="description" id="description" rows="5" cols="40" required>{{ route['description'] }}</textarea><br>
+        <button type="submit">Edit</button>
+        
+    </form>
+    
+</body>
+</html>

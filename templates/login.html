@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login page</title>
+</head>
+<body>
+    <form action="{{ url_for('check_login') }}" method="POST">
+        <h1>Enter your ID and username</h1>
+        <label for="user_id">ID:</label>
+        <input type="text" id="user_id" name="user_id" placeholder="Insert here your ID number..." required>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Insert here your username..." required>
+        <button type="submit">Login</button>
+    </form>
+    <button onclick="window.location.href='/'">Back home</button>
+</body>
+</html>

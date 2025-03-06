@@ -76,17 +76,17 @@ def list_routes(list_all: bool, user_id: int = 0, status = ''):
         url = "http://127.0.0.1:5000/routes"
     else:
         if status == 'sent':
-            url = f"http://127.0.0.1:5000/users/{user_id}/routes?type=sent"
+            url = f"http://127.0.0.1:5000/users/{user_id}/routes%stype=sent"
         elif status == 'project':
-            url = f"http://127.0.0.1:5000/users/{user_id}/routes?type=project"
+            url = f"http://127.0.0.1:5000/users/{user_id}/routes%stype=project"
         else:
-            url = f"http://127.0.0.1:5000/users/{user_id}/routes?type=wish"
+            url = f"http://127.0.0.1:5000/users/{user_id}/routes%stype=wish"
 
        
     response = requests.get(url)
     routes_list = response.json()
 
-    #faz sentido carregar os setores aqui?
+    #faz sentido carregar os setores aqui%s
     url = "http://127.0.0.1:5000/crags"
     response = requests.get(url)
     crags_list = response.json()

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crags page</title>
+</head>
+<body>
+    <form>
+        <h2>Your crags</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Country</th>
+                    <th>City</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for crag in crags %}
+                <tr>
+                    <td>{{ crag['id'] }}</td>
+                    <td>{{ crag['cragname'] }}</td>
+                    <td>{{ crag['country'] }}</td>
+                    <td>{{ crag['city'] }}</td>
+                    <td>
+                        <form action="/crags/{{ crag['id'] }}" method="POST">
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete this crag%s');">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+    <form action="/crags" method="POST">
+        <h2>Add a new crag</h2>
+        <label for="cragname">Crag name:</label>
+        <input type="text" id="cragname" name="cragname" placeholder="crag name..." required>
+
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" placeholder="country..." required>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" placeholder="city..." required>
+        <button type="submit">Add</button>
+    </form>
+    <a href="/">Back...</a>
+</body>
+</html>
