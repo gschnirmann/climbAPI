@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 import sqlite3
 import psycopg2
 import psycopg2.extras
+import os
 
 
 
@@ -13,6 +14,7 @@ import psycopg2.extras
 #Creates a flask class instance
 app = Flask(__name__)
 
+port = int(os.environ.get("PORT", 5000))
 
 def db_connection():
     conn = psycopg2.connect(
@@ -443,4 +445,4 @@ def edit_route(user_id, route_id):
         return jsonify({'error': 'not updated'}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=port)
