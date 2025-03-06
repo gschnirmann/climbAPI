@@ -16,14 +16,17 @@ app = Flask(__name__)
 
 port = int(os.environ.get("PORT", 5000))
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 def db_connection():
-    conn = psycopg2.connect(
+    """conn = psycopg2.connect(
         dbname = "climb_api_db",
         user = "gschnirmann",
         password = "geleia1924!",
         host = "localhost",
         port = "5432"
-    )
+    )"""
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
 
