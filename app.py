@@ -30,30 +30,23 @@ appConf = {
 oauth = OAuth(app)
 
 
+
 #Settings for security. It depends if its running on the deply server or in the localhost for testing. The variables are taken from os.getenv (DB and Google)
 #Its needed a flask secret to create a session.
 FLASK_SECRET = os.getenv("FLASK_SECRET")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
-if not FLASK_SECRET:
-    app.secret_key = "b1b8060b-162a-42e7-b453-bf546f53c526"
-    google = oauth.register(name='google',
-               client_id = "998972561848-48bcvrgestgv33gaqjsuhk4p08f2oh7f.apps.googleusercontent.com",
-               client_secret="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",
-               authorize_params={"prompt": "select_account"},
-               server_metadata_url=appConf.get("OAUTH2_META_URL"),
-               client_kwargs={
-                   "scope": "openid profile email",
-               })
-else:
-    app.secret_key = FLASK_SECRET
-    google = oauth.register(name='google',
-               client_id = GOOGLE_CLIENT_ID,
-               client_secret = GOOGLE_CLIENT_SECRET,
-               authorize_params={"prompt": "select_account"},
-               server_metadata_url=appConf.get("OAUTH2_META_URL"),
-               client_kwargs={
-                   "scope": "openid profile email",
-               })
+
+app.secret_key = FLASK_SECRET
+google = oauth.register(name='google',
+            client_id = GOOGLE_CLIENT_ID,
+            client_secret = GOOGLE_CLIENT_SECRET,
+            authorize_params={"prompt": "select_account"},
+            server_metadata_url=appConf.get("OAUTH2_META_URL"),
+            client_kwargs={
+               "scope": "openid profile email",
+            })
 
 
 
