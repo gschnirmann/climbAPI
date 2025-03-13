@@ -76,6 +76,8 @@ def force_clear_session():
     if not app.config["SESSION_CLEARED_ON_START"]:  # Só limpa na primeira request após restart
         session.clear()
         app.config["SESSION_CLEARED_ON_START"] = True  # Marca que já limpou uma vez
+    if "username" not in session:
+        session.clear()
 
 
 #login for google
