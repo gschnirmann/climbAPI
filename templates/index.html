@@ -7,16 +7,30 @@
 </head>
 <body>
     <h1>Climbing API</h1>
-
+    {% if session %}
+    <form action="{{ url_for('check_login') }}" method="POST">
+        <h1>User {{pretty}} logged in... </h1>
+        <p>Go to the climb API menu...</p>
+        <button type="submit">Menu</button>
+    </form>
+    <form action="{{ url_for('logout_google') }}" method="POST">
+        <button type="submit">Logout</button>
+    </form>
+    {% else %}
     <h2>Sign in or Log in? </h2>
     <form action="/login" method="GET" target ="_blank">
         <h3>I have an account</h3>
         <button type="subtmit">Login</button>
     </form>
+    <form action="/login/google" method="GET" target="_blank">
+        <h3>Login with google?</h3>
+        <button type="submit">Google</button>
+    </form>
     <form action="/register" method="GET" target="_blank">
         <h3>Create a new username</h3>
         <button type="submit">Register</button>
     </form>
+    {% endif %}
    
     
 </body>
