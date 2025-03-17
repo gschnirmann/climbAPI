@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <form action="">
+        <h4>Choose the grade system:</h4>
+        <input type="radio" id="br" name="grade_system" value="BR">
+        <label for="br">BR</label>
+
+        <input type="radio" id="fr" name="grade_system" value="FR">
+        <label for="fr">FR</label>
+
+        <input type="radio" id="us" name="grade_system" value="US">
+        <label for="us">US</label>
+    </form>
+    
     <h1>Welcome, {{ username }}</h1>
     <h2>Your routes</h2>
     <table>
