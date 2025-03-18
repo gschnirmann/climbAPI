@@ -11,8 +11,12 @@
         <label for="name">Name: </label>
         <input type="text" name="name" id="name" value="{{ route['name'] }}" required><br>
 
-        <label for="grade">Name: </label>
-        <input type="text" name="grade" id="grade" value="{{ route['grade'] }}" required><br>
+        <label for="grade">Grade: </label>
+        <select name="grade" id="grade">
+            {% for grade in grades%}
+            <option value="{{ grade }}">{{ grade }}</option>
+            {% endfor %}
+        </select>
 
         <label for="type">Status: </label>
         <select name="type" id="type">
