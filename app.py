@@ -4,6 +4,7 @@ import psycopg2
 import psycopg2.extras
 import os
 from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
 
 
 #seria /user/123/routes
@@ -11,7 +12,8 @@ from authlib.integrations.flask_client import OAuth
 #sempre /recurso/id/subrecurso
 
 
-#
+#Load var from .env
+load_dotenv()
 
 
 #Creates a flask class instance
@@ -32,29 +34,38 @@ oauth = OAuth(app)
 
 #Settings for security. It depends if its running on the deply server or in the localhost for testing. The variables are taken from os.getenv (DB and Google)
 #Its needed a flask secret to create a session.
-FLASK_SECRET = os.getenv("FLASK_SECRET")
+app.secret_key = os.getenv("FLASK_SECRET")
 
-if not FLASK_SECRET:
-    app.secret_key = "b1b8060b-162a-42e7-b453-bf546f53c526"
-    google = oauth.register(name='google',
-               client_id = "998972561848-48bcvrgestgv33gaqjsuhk4p08f2oh7f.apps.googleusercontent.com",
-               client_secret="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",
-               authorize_params={"prompt": "select_account"},
-               server_metadata_url=appConf.get("OAUTH2_META_URL"),
-               client_kwargs={
-                   "scope": "openid profile email",
-               })
-else:
-    app.secret_key = FLASK_SECRET
-    google = oauth.register(name='google',
-               client_id = GOOGLE_CLIENT_ID,
-               client_secret = GOOGLE_CLIENT_SECRET,
-               authorize_params={"prompt": "select_account"},
-               server_metadata_url=appConf.get("OAUTH2_META_URL"),
-               client_kwargs={
-                   "scope": "openid profile email",
-               })
 
+google = oauth.register(name='google',
+            client_id = os.getenv("GOOGLE_CLIENT_ID"),
+            client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+            authorize_params={"prompt": "select_account"},
+            server_metadata_url=appConf.get("OAUTH2_META_URL"),
+            client_kwargs={
+                   "scope": "openid profile email",
+            })
+
+GRADE_CONVERSION = {
+    "FR": {
+        "5": {"BR": "IV", "US": "5.7"},
+        "5+": {"BR": "V", "US": "5.8"},
+        "6a": {"BR": "Vsup", "US": "5.9"},
+        "6a+": {"BR": "VI", "US": "5.10a"},
+        "6b": {"BR": "VI+", "US": "5.10b"},
+        "6b+": {"BR": "VI+", "US": "5.10c/d"},
+        "6c": {"BR": "VIIa", "US": "5.11a"},
+        "6c+": {"BR": "VIIb", "US": "5.11b"},
+        "7a": {"BR": "VIIc", "US": "5.11c/d"},
+        "7a+": {"BR": "VIIIa", "US": "5.12a"},
+        "7b": {"BR": "VIIIb", "US": "5.12b"},
+        "7b+": {"BR": "VIIIc", "US": "5.12c/d"},
+        "7c": {"BR": "IXa", "US": "5.13a"},
+        "7c+": {"BR": "IXb", "US": "5.13b"},
+        "8a": {"BR": "IXc", "US": "5.13c"},
+        # Adicione mais graus conforme necessário
+    }
+}
 
 
 
@@ -67,11 +78,11 @@ def db_connection():
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     else:
         conn = psycopg2.connect(
-            dbname = "climb_api_db",
-            user = "gschnirmann",
-            password = "geleia1924!",
-            host = "localhost",
-            port = "5432"
+            dbname=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
         )
     #vem da variável de ambiente do banco na nuvem.
     
@@ -357,6 +368,7 @@ def find_route(route_id):
 
 @app.route('/users/<int:user_id>/routes', methods=['POST'])
 def add_route_to_user(user_id):
+    
     name = request.form.get('name')
     grade = request.form.get('grade')
     type = request.form.get('type')
@@ -397,11 +409,12 @@ def add_route_to_user(user_id):
 
 @app.route('/users/<int:user_id>/routes', methods=['GET'])
 def list_sent_routes(user_id):
-    #conn = sqlite3.connect('climb_API_db')
+    user_grade_system = request.args.get('grade_system', 'FR')
+    session['grade_system'] = user_grade_system
     conn = db_connection()
-    #conn.row_factory = sqlite3.Row #returns with the columns name in a dictionary
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     routes = []
+    grades = []
    
     type_filter = request.args.get("type")
     if type_filter:
@@ -414,6 +427,15 @@ def list_sent_routes(user_id):
         routes = [dict(row) for row in result]
     conn.commit()
     conn.close()
+
+    for route in routes:
+        grade = route['grade']
+        #GRADE_CONVERSION["FR"].get(grade, {}): Procura na tabela de conversão o grau que veio do banco (se não existir retorna {} )
+        #Teoricamente foi retornado o BR e US com seus respectivos graus
+        #get(user_grade_system, grade): pega o sistema que o usuário escolheu
+        #Retornará o valor US ou BR, caso seja FR vai manter o padrão
+        converted_grade = GRADE_CONVERSION["FR"].get(grade, {}).get(user_grade_system, grade)
+        route['grade'] = converted_grade
     
     #conn = sqlite3.connect('climb_API_db')
     conn = db_connection()
@@ -434,8 +456,16 @@ def list_sent_routes(user_id):
     conn.commit()
     conn.close()
 
+
+    #creates the user_grade_system grades to render in the html page
+    if user_grade_system == "FR":
+        grades = [k for k in GRADE_CONVERSION["FR"].keys()]
+    else:
+        grades = [v[user_grade_system] for v in GRADE_CONVERSION["FR"].values()]
+        
+
     
-    return render_template('routes_page.html',routes=routes, username=username, crags=crags, user_id=user_id)
+    return render_template('routes_page.html',routes=routes, username=username, crags=crags, user_id=user_id, selected_system = user_grade_system, grades=grades)
 
 
     
@@ -536,8 +566,14 @@ def show_edit_route(user_id, route_id):
     conn.commit()
     conn.close()
 
+    grades = []
+    if session['grade_system'] == "FR":
+        grades = [k for k in GRADE_CONVERSION['FR'].keys()]
+    else:
+        grades = [v[session['grade_system']] for v in GRADE_CONVERSION['FR'].values()]
+
     if route:
-        return render_template('edit_route.html', username=username, route=route, crags=crags, user_id=user_id)
+        return render_template('edit_route.html', username=username, route=route, crags=crags, user_id=user_id, grades=grades)
 
 @app.route('/routes/edit/<int:user_id>/<int:route_id>', methods=['POST'])
 def edit_route(user_id, route_id):

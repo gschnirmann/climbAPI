@@ -7,6 +7,24 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <form action="/users/{{ user_id }}/routes" method="GET">
+        <h4>Choose the grade system:</h4>
+        <input type="radio" id="fr" name="grade_system" value="FR" 
+            {% if selected_system == 'FR' %}checked{% endif %} 
+            onchange="this.form.submit()">
+        <label for="fr">FR</label>
+    
+        <input type="radio" id="br" name="grade_system" value="BR" 
+            {% if selected_system == 'BR' %}checked{% endif %} 
+            onchange="this.form.submit()">
+        <label for="br">BR</label>
+    
+        <input type="radio" id="us" name="grade_system" value="US" 
+            {% if selected_system == 'US' %}checked{% endif %} 
+            onchange="this.form.submit()">
+        <label for="us">US</label>
+    </form>
+    
     <h1>Welcome, {{ username }}</h1>
     <h2>Your routes</h2>
     <table>
@@ -37,7 +55,7 @@
                     </form>
                 </td>
                 <td>
-                    <form action="{{ url_for('show_edit_route', route_id=route['id'], user_id=user_id) }}" method="GET">
+                    <form action="{{ url_for('show_edit_route', route_id=route['id'], user_id=user_id)}}" method="GET">
                         <button type="submit" onclick>
                             Edit
                         </button>
@@ -53,7 +71,11 @@
         <input type="text" id="name" name="name" placeholder="route name..." required>
 
         <label for="grade">Grade:</label>
-        <input type="text" id="grade" name="grade" placeholder="route grade..." required>
+        <select name="grade" id="grade">
+            {% for grade in grades%}
+            <option value="{{ grade }}"> {{ grade }}</option>
+            {% endfor %}
+        </select>
 
         <label for="type">Status:</label>
         <select name="type" id="type">
