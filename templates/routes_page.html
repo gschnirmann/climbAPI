@@ -7,17 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-<<<<<<< HEAD
-    <form action="">
-        <h4>Choose the grade system:</h4>
-        <input type="radio" id="br" name="grade_system" value="BR">
-        <label for="br">BR</label>
-
-        <input type="radio" id="fr" name="grade_system" value="FR">
-        <label for="fr">FR</label>
-
-        <input type="radio" id="us" name="grade_system" value="US">
-=======
     <form action="/users/{{ user_id }}/routes" method="GET">
         <h4>Choose the grade system:</h4>
         <input type="radio" id="fr" name="grade_system" value="FR" 
@@ -33,7 +22,6 @@
         <input type="radio" id="us" name="grade_system" value="US" 
             {% if selected_system == 'US' %}checked{% endif %} 
             onchange="this.form.submit()">
->>>>>>> google_login
         <label for="us">US</label>
     </form>
     
