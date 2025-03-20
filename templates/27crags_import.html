@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routes from 27crags.com</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Route name</th>
+                <th>Crag</th>
+                <th>Grade</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+            </tr>
+        </thead>
+        <tbody>
+                {% for route in routes %}
+                <tr>
+                    <td>{{ route['name'] }}</td>
+                    <td>{{ route['crag'] }}</td>
+                    <td>{{ route['grade'] }}</td>
+                    <td>{{ route['crag_latitude'] }}</td>
+                    <td>{{ route['crag_longitude'] }}</td>
+                    
+                </tr>
+                {%endfor%}
+        </tbody>
+    </table>
+</body>
+</html>

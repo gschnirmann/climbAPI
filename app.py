@@ -5,6 +5,8 @@ import psycopg2.extras
 import os
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
+import requests
+from bs4 import BeautifulSoup
 
 
 #seria /user/123/routes
@@ -600,5 +602,75 @@ def edit_route(user_id, route_id):
     else:
         return jsonify({'error': 'not updated'}), 404
 
+
+@app.route('/crags/import/27crags', methods=['POST'])
+def import_27crags():
+    url = "https://27crags.com/crags/serra-do-cipo/routelist"
+    response = requests.get(url)
+    html = response.text
+
+    table = BeautifulSoup(html, "html.parser")
+    rows = table.find_all("tr")
+    data = []
+    for row in rows:
+        #extract the route name
+        name = row.find("div", class_="hidden")
+        name = name.text.strip() if name else "N/A"
+
+        #extract the crag
+        crag = row.find("div", class_="visible-xs-block")
+        crag = crag.find("a").text.strip() if crag and crag.find("a") else "N/A"
+
+        #extract the grade
+        grade = row.find("span", class_="grade")
+        grade = grade.text.strip() if grade else "N/A"
+
+        #ectract the style
+        style = row.find_all("td", class_="hidden-xs")
+        style = style[1].text.strip() if len(style) > 1 else "N/A"
+
+        #Extract the rating
+        rating = row.find("div", class_="rating")
+        rating = rating.text.strip() if rating else "N/A"
+
+        data.append({
+            "name": name,
+            "crag": crag,
+            "grade": grade,
+            "style": style,
+            "rating": rating
+        })
+
+    url = "https://27crags.com/crags/serra-do-cipo/cragmap"
+    response = requests.get(url)
+    html = response.text
+    soup = BeautifulSoup(html, "html.parser")
+    crags = []
+
+    script_tag = soup.find("script", text=lambda t: t and "GoogleMap(" in t)
+    if script_tag:
+        script_content = script_tag.string
+        start = script_content.find('"crag_sectors":[') + len('"crag_sectors":')
+        end = script_content.find(']', start) + 1
+        crags_json = script_content[start:end]
+        crags = json.loads(crags_json)
+
+
+
+    #Dicionário para ajudar na busca
+    crags_dict = {crag["name"]: crag for crag in crags}
+
+
+    for d in data:
+        crag_name = d["crag"]
+        if crag_name in crags_dict:
+            d['crag_latitude'] = crags_dict[crag_name]['latitude']
+            d['crag_longitude'] = crags_dict[crag_name]['longitude']
+
+    return render_template('27crags_import.html', routes=data)
+
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=port)
+

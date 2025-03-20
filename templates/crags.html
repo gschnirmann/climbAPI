@@ -49,6 +49,11 @@
         <input type="text" id="city" name="city" placeholder="city..." required>
         <button type="submit">Add</button>
     </form>
+
+    <form action="{{ url_for('import_27crags') }}" method="POST">
+        <h2>Import from 27crags</h2>
+        <button type="submit">27crags</button>
+    </form>
     <a href="/">Back...</a>
 </body>
 </html>
