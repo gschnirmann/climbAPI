@@ -374,6 +374,7 @@ def find_route(route_id):
 @app.route('/users/<int:user_id>/routes', methods=['POST'])
 def add_route_to_user(user_id):
     
+    date = request.form.get('attempt_date')
     name = request.form.get('name')
     grade = request.form.get('grade')
     type = request.form.get('type')
@@ -398,7 +399,7 @@ def add_route_to_user(user_id):
     if not crag:
         return jsonify({"error": "Crag not found"}), 400
     
-    cursor.execute('INSERT INTO routes (name,grade,type,user_id,crag_id,description) VALUES (%s,%s,%s,%s,%s,%s)', (name,grade,type,user_id,crag_id,description,))
+    cursor.execute('INSERT INTO routes (attempt_date,name,grade,type,user_id,crag_id,description) VALUES (%s,%s,%s,%s,%s,%s,%s)', (date,name,grade,type,user_id,crag_id,description,))
 
 
     conn.commit()
@@ -430,6 +431,7 @@ def list_sent_routes(user_id):
         cursor.execute('SELECT * FROM routes WHERE user_id = %s', (user_id,))
         result = cursor.fetchall()
         routes = [dict(row) for row in result]
+        
     conn.commit()
     conn.close()
 
@@ -441,6 +443,10 @@ def list_sent_routes(user_id):
         #Retornará o valor US ou BR, caso seja FR vai manter o padrão
         converted_grade = GRADE_CONVERSION["FR"].get(grade, {}).get(user_grade_system, grade)
         route['grade'] = converted_grade
+
+        #fix the date format
+        if route['attempt_date']:
+            route['attempt_date'] = route['attempt_date'].strftime('%Y-%m-%d')
     
     #conn = sqlite3.connect('climb_API_db')
     conn = db_connection()
@@ -585,6 +591,8 @@ def edit_route(user_id, route_id):
     #conn = sqlite3.connect('climb_API_db')
     conn = db_connection()
     cursor = conn.cursor()
+
+    date = request.form.get('attempt_date')
     name = request.form.get('name')
     grade = request.form.get('grade')
     status = request.form.get('type')
@@ -592,7 +600,7 @@ def edit_route(user_id, route_id):
     description = request.form.get('description')
 
 
-    cursor.execute('UPDATE routes SET name = %s, grade = %s, type = %s, crag_id = %s, description = %s WHERE id = %s',(name, grade, status, crag_id, description, route_id))
+    cursor.execute('UPDATE routes SET attempt_date = %s, name = %s, grade = %s, type = %s, crag_id = %s, description = %s WHERE id = %s',(date,name, grade, status, crag_id, description, route_id))
 
     conn.commit()
     conn.close()

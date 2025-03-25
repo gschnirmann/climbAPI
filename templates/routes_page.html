@@ -30,6 +30,7 @@
     <table>
         <thead>
             <tr>
+                <th>Attempt date</th>
                 <th>Name</th>
                 <th>Grade</th>
                 <th>Crag</th>
@@ -42,6 +43,7 @@
         <tbody>
             {% for route in routes %}
             <tr>
+                <td>{{ route['attempt_date'] }}</td>
                 <td>{{ route['name'] }}</td>
                 <td>{{ route['grade'] }}</td>
                 <td>{{ route['crag_id'] }}</td>
@@ -67,6 +69,10 @@
     </table>
     <form action="/users/{{ user_id }}/routes" method="POST">
         <h2>Add a new route</h2>
+
+        <label for="attempt_date">Attempt date:</label>
+        <input type="attempt_date" id="attempt_date" name="attempt_date" size="30" value="2025-03-25">
+
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" placeholder="route name..." required>
 
