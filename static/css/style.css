@@ -65,3 +65,13 @@ tr:hover td {
         width: 150px;
         margin: 20px auto;
 }
+
+.attempts-table{
+    display: none;
+    margin-top: 10px;
+}
+
+.attempts-button {
+    margin-top: 10px;
+    cursor: pointer;
+}

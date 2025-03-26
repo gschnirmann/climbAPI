@@ -431,6 +431,7 @@ def list_sent_routes(user_id):
         cursor.execute('SELECT * FROM routes WHERE user_id = %s', (user_id,))
         result = cursor.fetchall()
         routes = [dict(row) for row in result]
+
         
     conn.commit()
     conn.close()
@@ -447,6 +448,15 @@ def list_sent_routes(user_id):
         #fix the date format
         if route['attempt_date']:
             route['attempt_date'] = route['attempt_date'].strftime('%Y-%m-%d')
+        
+        #take the route attempts
+        conn = db_connection()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        attempts = []
+        cursor.execute('SELECT * FROM attempts WHERE route_id = %s ORDER BY attempt_date DESC', (route['id'],))
+        result = cursor.fetchall()
+        attempts = [dict(row) for row in result]
+        route['attempts'] = attempts 
     
     #conn = sqlite3.connect('climb_API_db')
     conn = db_connection()
@@ -678,6 +688,19 @@ def import_27crags():
     return render_template('27crags_import.html', routes=data)
 
 
+@app.route('/add_attempt/<int:user_id>/<int:route_id>', methods=['POST'])
+def add_attempt(user_id, route_id):
+    conn = db_connection()
+    cursor = conn.cursor()
+    status = request.form.get('status')
+    description = request.form.get('description')
+
+    cursor.execute('INSERT INTO attempts (route_id, user_id, status, description) VALUES (%s,%s,%s,%s)', (route_id, user_id, status, description,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('list_sent_routes', user_id=user_id))
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=port)
