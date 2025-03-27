@@ -171,6 +171,7 @@ def check_login():
         if result:
             conn.commit()
             conn.close()
+            session['user_id'] = result[0]
             return render_template('menu_page.html', username=session["username"], user_id=result[0])
         #register the new user to the db
         else:
@@ -180,7 +181,7 @@ def check_login():
             #get the new user id
             cursor.execute("SELECT user_id FROM users where username = %s", (session["username"],))
             result = cursor.fetchone()
-           
+            session['user_id'] = result[0]
             conn.close()
             return render_template('menu_page.html', username=session["username"], user_id=result[0])
         
@@ -198,7 +199,7 @@ def check_login():
         conn.commit()
         conn.close()
         session["username"] = username
-        
+        session['user_id'] = user_id
         if result:
             #entender se faz sentido passar o username no query parameter ou se faço a busca no bd depois
             #return redirect(url_for('user_page', user_id=user_id))
@@ -538,6 +539,22 @@ def remove_route(route_id):
     conn.commit()
     conn.close()
 
+    if cursor.rowcount > 0:
+        return redirect(url_for('list_sent_routes', user_id=user_id))
+        #return jsonify({'delete':'success'}), 200
+    else:
+        return jsonify({'error': 'not deleted'}), 404
+
+#delete an attempt from a route
+#entender se devemos usar user_id na session
+@app.route('/routes/<int:route_id>/attempts/<int:attempt_id>', methods=['POST'])
+def remove_attempt(route_id, attempt_id):
+    user_id = session['user_id']
+    conn = db_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM attempts WHERE id = %s AND route_id = %s', (attempt_id, route_id,))
+    conn.commit()
+    conn.close()
     if cursor.rowcount > 0:
         return redirect(url_for('list_sent_routes', user_id=user_id))
         #return jsonify({'delete':'success'}), 200
