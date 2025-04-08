@@ -581,7 +581,6 @@ def remove_crag(crag_id):
 #PUT endpoints
 @app.route('/routes/edit/<int:user_id>/<int:route_id>', methods=['GET'])
 def show_edit_route(user_id, route_id):
-    
     #conn = sqlite3.connect('climb_API_db')
     conn = db_connection()
     #conn.row_factory = sqlite3.Row #returns with the columns name in a dictionary
@@ -637,6 +636,48 @@ def edit_route(user_id, route_id):
     else:
         return jsonify({'error': 'not updated'}), 404
 
+
+#Edit an attempt
+@app.route('/users/<int:user_id>/routes/<int:route_id>/attempts/<int:attempt_id>/edit', methods=['GET'])
+def show_edit_attempt(user_id, route_id, attempt_id):
+    #conn = sqlite3.connect('climb_API_db')
+    conn = db_connection()
+    #conn.row_factory = sqlite3.Row #returns with the columns name in a dictionary
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('SELECT * FROM routes WHERE id = %s', (route_id,))
+    route = dict(cursor.fetchone())
+
+    #select attempts
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('SELECT * FROM attempts WHERE id = %s', (attempt_id,))
+    attempt = dict(cursor.fetchone())
+
+    conn.commit()
+    conn.close()
+
+    if route:
+        return render_template('edit_attempt.html', route=route, attempt=attempt, user_id=user_id)
+
+@app.route('/users/<int:user_id>/routes/<int:route_id>/attempts/<int:attempt_id>/edit', methods=['POST'])
+def edit_attempt(user_id, route_id, attempt_id):
+    #conn = sqlite3.connect('climb_API_db')
+    conn = db_connection()
+    cursor = conn.cursor()
+
+    date = request.form.get('attempt_date')
+    status = request.form.get('status')
+    description = request.form.get('description')
+
+
+    cursor.execute('UPDATE attempts SET attempt_date = %s, status = %s, description = %s WHERE id = %s',(date, status, description, attempt_id))
+
+    conn.commit()
+    conn.close()
+
+    if cursor.rowcount > 0:
+        return redirect(url_for('list_sent_routes', user_id=user_id))
+    else:
+        return jsonify({'error': 'not updated'}), 404
 
 @app.route('/crags/import/27crags', methods=['POST'])
 def import_27crags():

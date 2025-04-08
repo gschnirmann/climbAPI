@@ -73,6 +73,13 @@
                             </button>
                         </form>
                     </td>
+                    <td>
+                        <form action="{{ url_for('show_edit_attempt',user_id=user_id, route_id=route['id'], attempt_id=attempt['id']) }}" method="GET">
+                            <button type="submit">
+                                Edit
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
 
