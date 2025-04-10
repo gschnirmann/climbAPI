@@ -423,17 +423,32 @@ def list_sent_routes(user_id):
     routes = []
     grades = []
    
-    type_filter = request.args.get("type")
-    if type_filter:
-        cursor.execute('SELECT * FROM routes WHERE user_id = %s and type = %s', (user_id, type_filter,))
-        result = cursor.fetchall()
-        routes = [dict(row) for row in result]
-    else:
-        cursor.execute('SELECT * FROM routes WHERE user_id = %s', (user_id,))
-        result = cursor.fetchall()
-        routes = [dict(row) for row in result]
+    grade_filter= request.args.get("grade")
+    crag_filter = request.args.get("crag")
+    status_filter = request.args.get("status")
 
-        
+    query = "SELECT * FROM routes WHERE user_id = %s"
+    params = [user_id]
+
+
+    if grade_filter:
+        query += " AND grade = %s"
+        params.append(grade_filter)
+    
+    if crag_filter:
+        query += " AND crag_id = %s"
+        params.append(crag_filter)
+    
+    if status_filter:
+        query += " AND type = %s"
+        params.append(status_filter)
+
+    cursor.execute(query, params)
+    result = cursor.fetchall()
+    routes = [dict(row) for row in result]   
+
+   
+       
     conn.commit()
     conn.close()
 

@@ -10,6 +10,35 @@
 
     <h1>Welcome, {{ username }}</h1>
     <h2>Your routes</h2>
+    <h3>Filter Routes</h3>
+    <form method="GET" action="{{ url_for('list_sent_routes', user_id=user_id)}}">
+        <label for="grade">Grade</label>
+        <select name="grade" id="grade">
+            <option value="">All</option>
+            {% for g in grades %}
+                <option value="{{ g }}">{{ g }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="crag">Crag:</label>
+        <select name="crag" id="crag">
+            <option value="">All</option>
+            {% for c in crags %}
+                <option value="{{ c['crag_id'] }}"> {{ c['cragname'] }} </option>
+            {% endfor %}
+        </select>
+
+        <label for="status">Status:</label>
+        <select name="status" id="status">
+            <option value="">All</option>
+            <option value="sent">Sent</option>
+            <option value="project">Project</option>
+            <option value="wish">Wish</option>
+        </select>
+
+        <button type="submit">Apply Filters</button>
+
+    </form>
     
     <table>
         <thead>
